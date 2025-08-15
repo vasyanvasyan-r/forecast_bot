@@ -16,18 +16,28 @@ dp.include_router(start.router)
 dp.include_router(auth.router)
 dp.include_router(forecast.router)
 
-
+test = False
 async def on_startup(bot: Bot):
-    for user_id in reboot_notifications:
+    if not test:
         try:
             await bot.send_message(
-                chat_id=user_id,
-                text="✅ Бот запущен",
-                reply_markup=reboot_menu
-            )
+                    chat_id=166853396,
+                    text="✅ Бот запущен",
+                    reply_markup=reboot_menu
+                )
         except Exception as e:
             print(f"Не удалось отправить {user_id}: {e}")
+        for user_id in reboot_notifications:
+            try:
+                await bot.send_message(
+                    chat_id=user_id,
+                    text="✅ Бот запущен",
+                    reply_markup=reboot_menu
+                )
+            except Exception as e:
+                print(f"Не удалось отправить {user_id}: {e}")
 async def main():
+    await on_startup(bot)
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

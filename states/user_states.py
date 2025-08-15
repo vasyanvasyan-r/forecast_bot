@@ -3,6 +3,8 @@ from aiogram.fsm.state import StatesGroup, State
 class AuthStates(StatesGroup):
     waiting_for_nickname = State()
     waiting_for_password = State()
+    reg_nick = State()
+    reg_code_word = State()
 
 class ForecastStates(StatesGroup):
     roma_score_fh = State()
@@ -14,3 +16,5 @@ class ForecastStates(StatesGroup):
     entering_assists = State()
     entering_first_goal = State()
     
+class NotificationsStates(StatesGroup):
+    start_up_notification = State()

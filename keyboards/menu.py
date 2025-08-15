@@ -4,7 +4,7 @@ from utils.storage import players_list_menu, scores_types
 start_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Авторизация")],
-        [KeyboardButton(text="Инфо")]
+        [KeyboardButton(text="Регистрация")]
     ],
     resize_keyboard=True
 )

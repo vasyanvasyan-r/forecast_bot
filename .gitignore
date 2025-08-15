@@ -16,8 +16,9 @@ venv/
 # --- Local config / secrets ---
 config.py
 credentials.json
-authorized_users.json
+data/authorized_users.json
 git_ignore.md
+data/dict_with_codes.json
 
 # --- OS-specific ---
 .DS_Store

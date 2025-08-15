@@ -29,3 +29,10 @@ forecast = {}
 forecast_trigger = ['Прогноз', 'Сделать прогноз']
 scores_types = ['0', '1', '2', '3', '4', '5', '6', '7', '8 и больше']
 first_scored = ['Рома', 'Соперник', 'Так и не откроют счет']
+
+# нотификация пользователей о запуске бота
+try:
+    with open(os.path.join(DATA_DIR, 'reboot_notifications.json'), 'r', encoding='utf-8') as f:
+        reboot_notifications = json.load(f)
+except:
+    reboot_notifications = {}
