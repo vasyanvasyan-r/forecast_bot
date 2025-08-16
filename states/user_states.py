@@ -18,3 +18,4 @@ class ForecastStates(StatesGroup):
     
 class NotificationsStates(StatesGroup):
     start_up_notification = State()
+    seting_reboot_notifications = State()

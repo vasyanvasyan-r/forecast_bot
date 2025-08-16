@@ -8,6 +8,8 @@ DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
 try:
     with open(os.path.join(DATA_DIR, 'authorized_users.json'), 'r', encoding='utf-8') as f:
         authorized_users = json.load(f)
+        authorized_users = {int(k): v for k, v in authorized_users.items()}
+    print('Загрузил авторизованных юзеров')
 except:
     authorized_users = {}
 
@@ -34,5 +36,13 @@ first_scored = ['Рома', 'Соперник', 'Так и не откроют �
 try:
     with open(os.path.join(DATA_DIR, 'reboot_notifications.json'), 'r', encoding='utf-8') as f:
         reboot_notifications = json.load(f)
+        reboot_notifications = {int(k): v for k, v in reboot_notifications.items()}
 except:
     reboot_notifications = {}
+
+try:
+    with open(os.path.join(DATA_DIR, 'notifications.json'), 'r', encoding='utf-8') as f:
+        notifications = json.load(f)
+        notifications = {int(k): v for k, v in notifications.items()}
+except:
+    notifications = {}    

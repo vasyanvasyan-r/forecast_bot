@@ -19,6 +19,7 @@ credentials.json
 data/authorized_users.json
 git_ignore.md
 data/dict_with_codes.json
+forecasts.json
 
 # --- OS-specific ---
 .DS_Store

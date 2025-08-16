@@ -8,17 +8,17 @@ import json
 import os
 
 from states.user_states import AuthStates
-from keyboards.menu import auth_menu 
+from keyboards.menu import auth_menu
 from utils.storage import auth_dict, authorized_users, DATA_DIR
 
 router = Router()
 
 @router.message(StateFilter(None), lambda msg: msg.text == "Регистрация")
 async def ask_for_agreement(message: types.Message, state: FSMContext):
-    if str(message.from_user.id) in authorized_users:
+    if message.from_user.id in list(authorized_users.keys()):
         await message.answer(f"Вы уже авторизованы как "
-                             f"{authorized_users[str(message.from_user.id)]}", 
-                         reply_markup= ReplyKeyboardRemove())
+                             f"{authorized_users[message.from_user.id]}", 
+                         reply_markup = auth_menu)
     else:
         await message.answer("Придумайте себе ник!", 
                          reply_markup= ReplyKeyboardRemove())

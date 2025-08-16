@@ -4,6 +4,8 @@ from aiogram.filters import StateFilter
 from aiogram.types import ReplyKeyboardRemove
 from aiogram.filters import Command
 from aiogram.fsm.state import StatesGroup, State
+from datetime import datetime as dt
+from datetime import timedelta as td
 
 from states.user_states import ForecastStates
 from utils.storage import authorized_users, forecast, players_list, forecast_trigger, first_scored
@@ -148,6 +150,7 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
 async def first_goal_handler(message: types.Message, state: FSMContext):
     if message.text in first_scored:
         await state.update_data(first_scored=message.text.strip())
+        await state.update_data(timestamp=dt.now().strftime('%d-%m-%Y %H:%M:%S-%f'))
         data = await state.get_data()
         result = (
             f"✅ Ваш прогноз:\n"

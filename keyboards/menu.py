@@ -4,7 +4,8 @@ from utils.storage import players_list_menu, scores_types
 start_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Авторизация")],
-        [KeyboardButton(text="Регистрация")]
+        [KeyboardButton(text="Регистрация")],
+        [KeyboardButton(text="Уведомления")]
     ],
     resize_keyboard=True
 )
@@ -49,6 +50,20 @@ openning_menu = ReplyKeyboardMarkup(
 reboot_menu = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Начать")], [KeyboardButton(text="Отключить уведомления о старте бота")]
+    ],
+    resize_keyboard=True
+)
+
+notifications_start_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Уведомления о старте бота")]
+    ],
+    resize_keyboard=True
+)
+
+yes_no = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Да")], [KeyboardButton(text="Нет")]
     ],
     resize_keyboard=True
 )
