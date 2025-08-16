@@ -31,10 +31,7 @@ async def notifications_start(message: types.Message, state: FSMContext):
         await state.set_state(NotificationsStates.start_up_notification)
     else:
         await message.answer("Сначала надо авторизоваться", 
-                         reply_markup= start_menu)
-
-
-    
+                         reply_markup= start_menu)  
 
 @router.message(NotificationsStates.start_up_notification)
 async def ask_reboot_notifications(message: types.Message, state: FSMContext):

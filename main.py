@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from config import TOKEN
 
-from handlers import start, auth, forecast
+from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications
 
@@ -15,6 +15,7 @@ dp = Dispatcher(storage=MemoryStorage())
 dp.include_router(start.router)
 dp.include_router(auth.router)
 dp.include_router(forecast.router)
+dp.include_router(notifications.router)
 
 test = False
 async def on_startup(bot: Bot):
