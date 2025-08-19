@@ -45,4 +45,9 @@ try:
         notifications = json.load(f)
         notifications = {int(k): v for k, v in notifications.items()}
 except:
-    notifications = {}    
+    notifications = {}
+
+start_words = [
+    'начать',
+    'в стартовое меню'
+]

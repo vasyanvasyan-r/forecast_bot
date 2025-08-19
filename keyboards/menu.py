@@ -3,16 +3,15 @@ from utils.storage import players_list_menu, scores_types
 # Стартовое меню
 start_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Авторизация")],
-        [KeyboardButton(text="Регистрация")],
-        [KeyboardButton(text="Уведомления")]
+        [KeyboardButton(text="Авторизация"), KeyboardButton(text="Регистрация")],
+        [KeyboardButton(text="Сделать прогноз"), KeyboardButton(text="Уведомления")]
     ],
     resize_keyboard=True
 )
 # После авторизации
 auth_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Сделать прогноз"), KeyboardButton(text="Мои ачивки")]
+        [KeyboardButton(text="Сделать прогноз"), KeyboardButton(text="Мои ачивки"), KeyboardButton(text="Уведомления")]
     ],
     resize_keyboard=True
 )
@@ -56,7 +55,10 @@ reboot_menu = ReplyKeyboardMarkup(
 
 notifications_start_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Уведомления о старте бота")]
+        [KeyboardButton(text="Уведомления о старте бота")], 
+        [KeyboardButton(text="Уведомления о старте/окончании приема прогнозов")],
+        [KeyboardButton(text="Напоминалка")],
+        [KeyboardButton(text="В стартовое меню")]
     ],
     resize_keyboard=True
 )

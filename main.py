@@ -27,8 +27,8 @@ async def on_startup(bot: Bot):
                     reply_markup=reboot_menu
                 )
         except Exception as e:
-            print(f"Не удалось отправить {user_id}: {e}")
-        for user_id in reboot_notifications:
+            print(f"Не удалось отправить master: {e}")
+        for user_id in [key for key, value in reboot_notifications.items() if value == 'yes']:
             try:
                 await bot.send_message(
                     chat_id=user_id,

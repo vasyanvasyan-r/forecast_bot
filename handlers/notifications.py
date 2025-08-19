@@ -15,18 +15,19 @@ import os
 
 router = Router()
 
-@router.message(StateFilter(None), lambda msg: msg.text == "Уведомления")
+@router.message(StateFilter(None), lambda msg: msg.text in ["Уведомления", 
+                                                            "Отключить уведомления о старте бота"])
 async def notifications_start(message: types.Message, state: FSMContext):
-    user_id = str(message.from_user.id)
+    user_id = message.from_user.id
     if user_id in authorized_users:
         if user_id in notifications:
             await message.answer(f"Выберете, какие настройки хотите изменить, "
-                             f"{authorized_users[str(message.from_user.id)]}", 
+                             f"{authorized_users[message.from_user.id]}", 
                          reply_markup= notifications_start_menu)
             
         else:
             await message.answer(f"Выберете, какое уведомление отправлять, "
-                             f"{authorized_users[str(message.from_user.id)]}", 
+                             f"{authorized_users[message.from_user.id]}", 
                          reply_markup= notifications_start_menu)
         await state.set_state(NotificationsStates.start_up_notification)
     else:
@@ -42,14 +43,25 @@ async def ask_reboot_notifications(message: types.Message, state: FSMContext):
 @router.message(NotificationsStates.seting_reboot_notifications)
 async def ask_reboot_notifications(message: types.Message, state: FSMContext):
     answer = message.text.strip()
+    user_id = message.from_user.id
     if answer == "Да":
-        user_id = message.from_user.id
+
         reboot_notifications[user_id] = 'yes'
         notifications[user_id] = ['reboot']
         async with aiofiles.open(os.path.join(DATA_DIR, "reboot_notifications.json"), mode="w") as f:
             await f.write(json.dumps(reboot_notifications) + "\n")
         async with aiofiles.open(os.path.join(DATA_DIR, "notifications.json"), mode="w") as f:
             await f.write(json.dumps(notifications) + "\n")
-    await message.answer(f"Хотите получать уведомления о старте бота?",
-                         reply_markup=yes_no)
-    await state.set_state(NotificationsStates.seting_reboot_notifications)    
+        await state.clear()
+        await message.answer(f"Понял, принял, записал."
+                         f"\nОтправлять буду",
+                         reply_markup=notifications_start_menu)
+    else:
+
+        reboot_notifications[user_id] = 'no'
+        async with aiofiles.open(os.path.join(DATA_DIR, "reboot_notifications.json"), mode="w") as f:
+            await f.write(json.dumps(reboot_notifications) + "\n")
+        await state.clear()
+        await message.answer(f"Понял, принял, записал."
+                         f"\nОтправлять не буду",
+                         reply_markup=notifications_start_menu)
