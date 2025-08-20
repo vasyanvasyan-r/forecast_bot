@@ -22,7 +22,7 @@ class MultiInputStates(StatesGroup):
 router = Router()
 
 # Старт прогноза
-@router.message(StateFilter(None), lambda msg: msg.text in forecast_trigger)
+@router.message(StateFilter(None), lambda message: message.text in forecast_trigger)
 async def start_forecast(message: types.Message, state: FSMContext):
     if message.from_user.id not in authorized_users:
         await message.answer("Сначала пройдите авторизацию.",

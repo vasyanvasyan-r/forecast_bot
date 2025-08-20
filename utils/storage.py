@@ -1,7 +1,11 @@
 import json
 import os
 
+from datetime import datetime as dt
+
+
 BASE_DIR = os.path.dirname(__file__)
+print(BASE_DIR)
 DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
 
 # Авторизованные пользователи
@@ -51,3 +55,15 @@ start_words = [
     'начать',
     'в стартовое меню'
 ]
+
+inprogress = ["Уведомления о старте/окончании приема прогнозов", 
+              "Напоминалка",
+              "Мои ачивки"]
+
+try:
+    with open(os.path.join(BASE_DIR, 'control.json'), 'r', encoding='utf-8') as f:
+        control = json.load(f)
+    print(control)
+except Exception as e:
+    print(f"Словарь контроля не считался"
+          f"[{dt.now()}] ❌ Error: {e}")

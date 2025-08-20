@@ -1,12 +1,13 @@
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from config import TOKEN
+from keys.config import TOKEN
 
 from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications
-
+import os
+ROOT_DIR = os.path.dirname(__file__)
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
@@ -17,17 +18,17 @@ dp.include_router(auth.router)
 dp.include_router(forecast.router)
 dp.include_router(notifications.router)
 
-test = False
+test = True
 async def on_startup(bot: Bot):
+    try:
+        await bot.send_message(
+                chat_id=166853396,
+                text="✅ Бот запущен",
+                reply_markup=reboot_menu
+            )
+    except Exception as e:
+        print(f"Не удалось отправить master: {e}")
     if not test:
-        try:
-            await bot.send_message(
-                    chat_id=166853396,
-                    text="✅ Бот запущен",
-                    reply_markup=reboot_menu
-                )
-        except Exception as e:
-            print(f"Не удалось отправить master: {e}")
         for user_id in [key for key, value in reboot_notifications.items() if value == 'yes']:
             try:
                 await bot.send_message(

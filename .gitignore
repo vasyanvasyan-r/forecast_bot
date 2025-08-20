@@ -14,12 +14,12 @@ venv/
 *.env
 
 # --- Local config / secrets ---
-config.py
-credentials.json
+keys/config.py
+keys/credentials.json
 data/authorized_users.json
 git_ignore.md
 data/dict_with_codes.json
-forecasts.json
+testing.ipynb
 
 # --- OS-specific ---
 .DS_Store

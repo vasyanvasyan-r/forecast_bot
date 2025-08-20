@@ -6,8 +6,9 @@ from aiogram.filters import Command
 from aiogram.fsm.state import StatesGroup, State
 
 from states.user_states import NotificationsStates
-from utils.storage import authorized_users, notifications, reboot_notifications, DATA_DIR
+from utils.storage import authorized_users, notifications, reboot_notifications, DATA_DIR, inprogress
 from keyboards.menu import notifications_start_menu, start_menu, yes_no
+from handlers.start import in_progress
 
 import aiofiles
 import json
@@ -36,9 +37,19 @@ async def notifications_start(message: types.Message, state: FSMContext):
 
 @router.message(NotificationsStates.start_up_notification)
 async def ask_reboot_notifications(message: types.Message, state: FSMContext):
-    await message.answer(f"Хотите получать уведомления о старте бота?",
-                         reply_markup=yes_no)
-    await state.set_state(NotificationsStates.seting_reboot_notifications)
+    answer = message.text.strip()
+    if answer in inprogress:
+        await state.clear()
+        await in_progress(message)
+    elif answer == "Уведомления о старте бота":
+
+        await message.answer(f"Хотите получать уведомления о старте бота?",
+                            reply_markup=yes_no)
+        await state.set_state(NotificationsStates.seting_reboot_notifications)
+    else:
+        await message.answer(f"Я вас не понял... \nВыберете, какое уведомление отправлять, "
+                            f"{authorized_users[message.from_user.id]}", 
+                reply_markup= notifications_start_menu)
 
 @router.message(NotificationsStates.seting_reboot_notifications)
 async def ask_reboot_notifications(message: types.Message, state: FSMContext):
@@ -64,4 +75,4 @@ async def ask_reboot_notifications(message: types.Message, state: FSMContext):
         await state.clear()
         await message.answer(f"Понял, принял, записал."
                          f"\nОтправлять не буду",
-                         reply_markup=notifications_start_menu)
+                         reply_markup=notifications_start_menu) 

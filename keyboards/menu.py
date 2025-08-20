@@ -22,6 +22,12 @@ players_menu = ReplyKeyboardMarkup(
     ] + [[KeyboardButton(text=f"Закончить ввод")]],
     resize_keyboard=True
 )
+tq_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text=f"{row[0]}"), KeyboardButton(text=f"{row[1]}")] for row in players_list_menu
+    ] + [[KeyboardButton(text=f"Закончить ввод")]],
+    resize_keyboard=True
+)
 # Заготовка для голов
 def scores_menu(prev_goals, scores_types = scores_types):
     i = scores_types.index(prev_goals)
