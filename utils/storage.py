@@ -2,7 +2,7 @@ import json
 import os
 
 from datetime import datetime as dt
-
+from datetime import timedelta as td
 
 BASE_DIR = os.path.dirname(__file__)
 print(BASE_DIR)
@@ -67,3 +67,26 @@ try:
 except Exception as e:
     print(f"Словарь контроля не считался"
           f"[{dt.now()}] ❌ Error: {e}")
+
+try:
+    with open(os.path.join(DATA_DIR, 'tq.json'), 'r', encoding='utf-8') as f:
+        tq = json.load(f)
+    print(tq)
+except Exception as e:
+    print(f"Временный не считался"
+          f"[{dt.now()}] ❌ Error: {e}")
+
+async def get_control(DIR = BASE_DIR):
+    try:
+        with open(os.path.join(DIR, 'control.json'), 'r', encoding='utf-8') as f:
+            control = json.load(f)
+    except Exception as e:
+        print(f"Словарь контроля не считался"
+            f"[{dt.now()}] ❌ Error: {e}")
+    return control
+
+async def update_time_in_control(control):
+    control['waiting'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2) > td(0)
+    control['polling'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2) < td(0) and not control['waiting']
+    control['closed'] = not control['waiting'] and not control ['polling']
+    return control

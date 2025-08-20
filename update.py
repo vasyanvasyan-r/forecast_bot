@@ -80,19 +80,34 @@ while parsing:
         print(f"[{dt.now()}] ❌ Error: {e}"
               "=== Перерыв на минуту ===")
         time.sleep(60)
+control = get_control(m_df)
 
+parsing = True
+while parsing:
+    try:
+        tq = fetch_data(temp_question)
+        tq = {'q': tq.loc[int(control['m_id']), 'question']}
+        print("Временный вопрос скачался")
+        parsing = False
+    except Exception as e:
+        print(f"[{dt.now()}] ❌ Error: {e}"
+              "=== Перерыв на минуту ===")
+        time.sleep(60)
 # control and players
+
 try:
     save_data(l_players, 'players', DATA_DIR)
     print("Игроки записались")
-    save_data(get_control(m_df), 'control', UTILS_DIR)
+    save_data(tq, 'tq', DATA_DIR)
+    print("Временный вопрос записался")    
+    save_data(control, 'control', UTILS_DIR)
     print("Контроль записан")
 except Exception as e:
         print(f"[{dt.now()}] ❌ Error: {e}")
 
 print(get_control(m_df))
 
-"""
+
 def main():
     while True:
         try:
@@ -104,4 +119,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-"""

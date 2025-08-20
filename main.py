@@ -6,8 +6,7 @@ from keys.config import TOKEN
 from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications
-import os
-ROOT_DIR = os.path.dirname(__file__)
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=MemoryStorage())

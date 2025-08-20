@@ -7,6 +7,8 @@ class AuthStates(StatesGroup):
     reg_code_word = State()
 
 class ForecastStates(StatesGroup):
+    temp_question = State()
+
     roma_score_fh = State()
     rival_score_fh = State()
     roma_score_ft = State()
@@ -19,3 +21,7 @@ class ForecastStates(StatesGroup):
 class NotificationsStates(StatesGroup):
     start_up_notification = State()
     seting_reboot_notifications = State()
+
+class MultiInputStates(StatesGroup):
+    waiting_inputs_scorers = State()
+    waiting_inputs_assists = State()

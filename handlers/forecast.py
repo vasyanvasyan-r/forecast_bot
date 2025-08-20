@@ -7,17 +7,16 @@ from aiogram.fsm.state import StatesGroup, State
 from datetime import datetime as dt
 from datetime import timedelta as td
 
-from states.user_states import ForecastStates
-from utils.storage import authorized_users, forecast, players_list, forecast_trigger, first_scored, DATA_DIR
-from keyboards.menu import auth_menu, players_menu, scores_menu, openning_menu, start_menu
+from states.user_states import ForecastStates, MultiInputStates
+from utils.storage import authorized_users, \
+    forecast, players_list, forecast_trigger, first_scored, \
+        DATA_DIR, get_control, control, tq, update_time_in_control
+from keyboards.menu import auth_menu, players_menu, scores_menu, openning_menu, start_menu, tq_menu
 
 import aiofiles
 import json
 import os
 
-class MultiInputStates(StatesGroup):
-    waiting_inputs_scorers = State()
-    waiting_inputs_assists = State()
 
 router = Router()
 
@@ -28,11 +27,34 @@ async def start_forecast(message: types.Message, state: FSMContext):
         await message.answer("Сначала пройдите авторизацию.",
                               reply_markup=start_menu)
         return
+    try:
+        control = await get_control()
+    except:
+        print("Использую стартовую версию контрольного словаря")
+    
+    control = await update_time_in_control(control)
+    if control['polling']:
 
-    await message.answer("Сколько Рома забьет в первом тайме?",
-                         reply_markup=scores_menu('0'))
+        await message.answer(f"{tq['q']}",
+                            reply_markup=tq_menu)
+        await state.set_state(ForecastStates.temp_question)
+    elif control['closed']:
+        await message.answer("Прогнозы уже не принимаются",
+                              reply_markup=start_menu)        
+    elif control['waiting']:
+        await message.answer("Прогнозы еще не принимаются",
+                              reply_markup=start_menu)
+    else:
+        await message.answer("Неизвестная ошибка. Попробуйте еще раз.",
+                              reply_markup=start_menu)
+
+@router.message(ForecastStates.temp_question)
+async def temp_q_parsing(message: types.Message, state: FSMContext):
+    await state.update_data(coach=message.text.strip())
+
+    await message.answer("Сколько забьет Рома в первом тайме?",
+                         reply_markup = scores_menu('0'))
     await state.set_state(ForecastStates.roma_score_fh)
-
 # 1. Счёт первого тайма
 @router.message(ForecastStates.roma_score_fh)
 async def score_fh_roma_handler(message: types.Message, state: FSMContext):
@@ -154,26 +176,39 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
 # 5. Кто откроет счёт
 @router.message(ForecastStates.entering_first_goal)
 async def first_goal_handler(message: types.Message, state: FSMContext):
-    if message.text in first_scored:
-        await state.update_data(first_scored=message.text.strip())
-        await state.update_data(timestamp=dt.now().strftime('%d-%m-%Y %H:%M:%S-%f'))
-        data = await state.get_data()
-        result = (
-            f"✅ Ваш прогноз:\n"
-            f"▪ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} Противник\n"
-            f"▪ Счёт матча: Рома {data['r_s']} -- {data['r_m']} Противник\n"
-            f"▪ Голы: {data['scorers']}\n"
-            f"▪ Ассисты: {data['assists']}\n"
-            f"▪ Первый гол: {data['first_scored']}"
-        )
-        await message.answer(result)
 
-        forecast[authorized_users[message.from_user.id]] = data
-        async with aiofiles.open(os.path.join(DATA_DIR, "forecasts.json"), mode="w") as f:
-            await f.write(json.dumps(forecast) + "\n")
+    try:
+        control = await get_control()
+    except:
+        print("Использую стартовую версию контрольного словаря")
+
+    control = await update_time_in_control(control)
+
+    if control['closed']:
         await state.clear()
-        await message.answer("Прогноз записан", reply_markup=auth_menu)
-    else:
-        await message.answer("Нет такого варианта, воспользуйтесь списком")
+        await message.answer(f"Прогнозы не принимаются. Меньше двух часов. Матч в {control['data']['date']}", 
+                             reply_markup=auth_menu)
+    else:        
+        if message.text in first_scored:
+            await state.update_data(first_scored=message.text.strip())
+            await state.update_data(timestamp=dt.now().strftime('%d-%m-%Y %H:%M:%S-%f'))
+            data = await state.get_data()
+            result = (
+                f"✅ Ваш прогноз:\n"
+                f"▪ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} {control['data']['rival']}\n"
+                f"▪ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
+                f"▪ Голы: {data['scorers']}\n"
+                f"▪ Ассисты: {data['assists']}\n"
+                f"▪ Первый гол: {data['first_scored']}"
+            )
+            await message.answer(result)
+
+            forecast[authorized_users[message.from_user.id]] = data
+            async with aiofiles.open(os.path.join(DATA_DIR, "forecasts.json"), mode="w") as f:
+                await f.write(json.dumps(forecast) + "\n")
+            await state.clear()
+            await message.answer("Прогноз записан", reply_markup=auth_menu)
+        else:
+            await message.answer("Нет такого варианта, воспользуйтесь списком")
 
 
