@@ -17,6 +17,8 @@ venv/
 keys/config.py
 keys/credentials.json
 data/authorized_users.json
+data/reboot_notifications.json
+data/notifications.json
 git_ignore.md
 data/dict_with_codes.json
 testing.ipynb
