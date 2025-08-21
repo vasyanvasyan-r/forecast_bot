@@ -19,9 +19,12 @@ keys/credentials.json
 data/authorized_users.json
 data/reboot_notifications.json
 data/notifications.json
+data/tq.json
+data/forecasts.json
 git_ignore.md
 data/dict_with_codes.json
 testing.ipynb
+pull_data/all_forecasts.json
 
 # --- OS-specific ---
 .DS_Store

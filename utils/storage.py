@@ -5,8 +5,9 @@ from datetime import datetime as dt
 from datetime import timedelta as td
 
 BASE_DIR = os.path.dirname(__file__)
-print(BASE_DIR)
 DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
+PULL_DIR = os.path.join(BASE_DIR, '..', 'pull_data')
+print(PULL_DIR)
 
 # Авторизованные пользователи
 try:
@@ -20,10 +21,10 @@ except:
 # Загрузка словаря кодов
 with open(os.path.join(DATA_DIR, 'dict_with_codes.json'), 'r', encoding='utf-8') as f:
     auth_dict = json.load(f)
-
+# загрузка игроков
 with open(os.path.join(DATA_DIR, 'players.json'), 'r', encoding='utf-8') as f:
     players_list = json.load(f)
-
+# заготовка для меню игроков
 if len(players_list) % 2 == 1:
     players_list += ['']
 
@@ -43,13 +44,20 @@ try:
         reboot_notifications = {int(k): v for k, v in reboot_notifications.items()}
 except:
     reboot_notifications = {}
-
+# прочая нотификация
 try:
     with open(os.path.join(DATA_DIR, 'notifications.json'), 'r', encoding='utf-8') as f:
         notifications = json.load(f)
         notifications = {int(k): v for k, v in notifications.items()}
 except:
     notifications = {}
+# все прогнозы
+try:
+    with open(os.path.join(PULL_DIR, 'all_forecasts.json'), 'r', encoding='utf-8') as f:
+        all_forecasts = json.load(f)
+        all_forecasts = {str(k): v for k, v in all_forecasts.items()}
+except:
+    all_forecasts = {str(name): [] for name in authorized_users.values()}
 
 start_words = [
     'начать',
@@ -86,7 +94,7 @@ async def get_control(DIR = BASE_DIR):
     return control
 
 async def update_time_in_control(control):
-    control['waiting'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2) > td(0)
+    control['waiting'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2)) < td(0)
     control['polling'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2)) < td(0) and not control['waiting']
     control['closed'] = not control['waiting'] and not control ['polling']
     return control

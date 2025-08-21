@@ -2,15 +2,13 @@ from aiogram import Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
 from aiogram.types import ReplyKeyboardRemove
-from aiogram.filters import Command
-from aiogram.fsm.state import StatesGroup, State
 from datetime import datetime as dt
-from datetime import timedelta as td
+
 
 from states.user_states import ForecastStates, MultiInputStates
 from utils.storage import authorized_users, \
-    forecast, players_list, forecast_trigger, first_scored, \
-        DATA_DIR, get_control, control, tq, update_time_in_control
+    forecast, players_list, forecast_trigger, first_scored, scores_types,\
+        DATA_DIR, PULL_DIR, get_control, tq, update_time_in_control, all_forecasts
 from keyboards.menu import auth_menu, players_menu, scores_menu, openning_menu, start_menu, tq_menu
 
 import aiofiles
@@ -23,7 +21,8 @@ router = Router()
 # Старт прогноза
 @router.message(StateFilter(None), lambda message: message.text in forecast_trigger)
 async def start_forecast(message: types.Message, state: FSMContext):
-    if message.from_user.id not in authorized_users:
+    user_id = message.from_user.id
+    if user_id not in authorized_users:
         await message.answer("Сначала пройдите авторизацию.",
                               reply_markup=start_menu)
         return
@@ -33,6 +32,7 @@ async def start_forecast(message: types.Message, state: FSMContext):
         print("Использую стартовую версию контрольного словаря")
     
     control = await update_time_in_control(control)
+    print(f'==== {authorized_users[user_id]} делает прогноз переменная управления: \n {control}')
     if control['polling']:
 
         await message.answer(f"{tq['q']}",
@@ -95,7 +95,10 @@ async def score_ft_opp_handler(message: types.Message, state: FSMContext):
 # 3. Автор голов
 @router.message(ForecastStates.entering_scorers)
 async def scorers_handler(message: types.Message, state: FSMContext):
-    if int((await state.get_data())['r_s']) == 0:
+    r_s = (await state.get_data())['r_s']
+    if r_s == scores_types[-1]:
+        r_s = 100
+    if int(r_s) == 0:
         await message.answer("Поскольку указали, что Рома не забьет, то и каличей указывать не надо")
         await state.update_data(scorers=[])
         await state.update_data(assists=[])
@@ -114,7 +117,11 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
     data = await state.get_data()
     inputs = data.get("inputs", [])
     i = data.get("scorer_count", 0)  # достаём текущий счётчик
-    r_s = int(data['r_s'])
+    r_s = data['r_s']
+    if r_s == scores_types[-1]:
+        r_s = 100
+    else:
+        r_s = int(r_s)
 
     if message.text in players_list:
         
@@ -125,7 +132,8 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
             await message.answer(f"Принято ({i}/{r_s}).")
         else:
             await message.answer(f"Принято ({i}/{r_s}). Ещё?")
-        
+    elif message.text.lower() == "закончить ввод":                
+        await message.answer("Понял, принял, записал")
     else:
         await message.answer("Нет такого футболиста, воспользуйтесь списком")
 
@@ -151,8 +159,11 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
     data = await state.get_data()
     inputs = data.get("inputs", [])
     i = data.get("assist_count", 0)  # достаём текущий счётчик
-    r_s = int(data['r_s'])
-
+    r_s = data['r_s']
+    if r_s == scores_types[-1]:
+        r_s = 100
+    else:
+        r_s = int(r_s)
     if message.text in players_list:
 
         inputs.append(message.text)
@@ -162,6 +173,8 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
             await message.answer(f"Принято ({i}/{r_s}).")
         else:
             await message.answer(f"Принято ({i}/{r_s}). Ещё?")
+    elif message.text.lower() == "закончить ввод":                
+        await message.answer("Понял, принял, записал")
     else:
         await message.answer("Нет такого футболиста, воспользуйтесь списком")
     
@@ -204,8 +217,11 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
             await message.answer(result)
 
             forecast[authorized_users[message.from_user.id]] = data
+            all_forecasts[authorized_users[message.from_user.id]] += [data]
             async with aiofiles.open(os.path.join(DATA_DIR, "forecasts.json"), mode="w") as f:
                 await f.write(json.dumps(forecast) + "\n")
+            async with aiofiles.open(os.path.join(PULL_DIR, "all_forecasts.json"), mode="w") as f:
+                await f.write(json.dumps(all_forecasts) + "\n")
             await state.clear()
             await message.answer("Прогноз записан", reply_markup=auth_menu)
         else:

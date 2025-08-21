@@ -24,8 +24,7 @@ players_menu = ReplyKeyboardMarkup(
 )
 tq_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text=f"{row[0]}"), KeyboardButton(text=f"{row[1]}")] for row in players_list_menu
-    ] + [[KeyboardButton(text=f"Закончить ввод")]],
+        [KeyboardButton(text=f"Рома"), KeyboardButton(text=f"Болонья")]],
     resize_keyboard=True
 )
 # Заготовка для голов

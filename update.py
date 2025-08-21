@@ -10,7 +10,7 @@ credentials = ServiceAccountCredentials.from_json_keyfile_name(path_to_credentia
 
 from datetime import datetime as dt
 from datetime import timedelta as td
-
+from functools import wraps
 import time
 import json
 import os
@@ -57,6 +57,32 @@ def save_data(data, name, dir):
     with open(tmp_file, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     os.replace(tmp_file, FILE_PATH)  # атомарная замена
+
+from functools import wraps
+
+def retry_on_exception(wait_sec=60, max_attempts=None):
+    """
+    Декоратор: повторяет выполнение функции при ошибке.
+    
+    :param wait_sec: сколько ждать между попытками
+    :param max_attempts: максимум попыток, None = бесконечно
+    """
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            attempts = 0
+            while True:
+                try:
+                    result = func(*args, **kwargs)
+                    return result
+                except Exception as e:
+                    attempts += 1
+                    print(f"[{dt.now()}] ❌ Error: {e} === Перерыв на {wait_sec} секунд ===")
+                    if max_attempts and attempts >= max_attempts:
+                        raise
+                    time.sleep(wait_sec)
+        return wrapper
+    return decorator
 
 #
 parsing = True
@@ -111,7 +137,9 @@ print(get_control(m_df))
 def main():
     while True:
         try:
-            save_data(get_control(m_df), 'control', ROOT_DIR)
+            time.sleep(60*60)
+
+            save_data(get_control(m_df), 'control', UTILS_DIR)
             print(f"[{dt.now()}] ✅ Control updated")
         except Exception as e:
             print(f"[{dt.now()}] ❌ Error: {e}")

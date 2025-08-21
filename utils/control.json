@@ -5,7 +5,7 @@
     "rival": "Болонья",
     "home": "1"
   },
-  "waiting": false,
-  "polling": true,
+  "waiting": true,
+  "polling": false,
   "closed": false
 }
