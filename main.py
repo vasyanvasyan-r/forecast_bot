@@ -7,7 +7,7 @@ from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications
 
-test = False
+test = True
 if not test:
     bot = Bot(token=TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
