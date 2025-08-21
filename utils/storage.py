@@ -87,6 +87,6 @@ async def get_control(DIR = BASE_DIR):
 
 async def update_time_in_control(control):
     control['waiting'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2) > td(0)
-    control['polling'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2) < td(0) and not control['waiting']
+    control['polling'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2)) < td(0) and not control['waiting']
     control['closed'] = not control['waiting'] and not control ['polling']
     return control

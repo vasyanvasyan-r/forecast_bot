@@ -1,23 +1,26 @@
 import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
-from keys.config import TOKEN
+from keys.config import TOKEN, TOKEN_TEST
 
 from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications
 
-
-bot = Bot(token=TOKEN)
-dp = Dispatcher(storage=MemoryStorage())
-
+test = True
+if not test:
+    bot = Bot(token=TOKEN)
+    dp = Dispatcher(storage=MemoryStorage())
+else: 
+    bot = Bot(token=TOKEN_TEST)
+    dp = Dispatcher(storage=MemoryStorage())
 # Регистрируем роутеры
 dp.include_router(start.router)
 dp.include_router(auth.router)
 dp.include_router(forecast.router)
 dp.include_router(notifications.router)
 
-test = True
+
 async def on_startup(bot: Bot):
     try:
         await bot.send_message(

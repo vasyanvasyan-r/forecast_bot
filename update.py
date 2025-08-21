@@ -46,8 +46,8 @@ def get_control(df):
     control = {}
     control['m_id'] = df.loc[[dt.strptime(i, "%d.%m.%Y %H:%M") > dt.now() for i in df.date] ,'match_id'].min()
     control['data'] = df.loc[int(control['m_id']), ['date', 'rival', 'home']].to_dict()
-    control['waiting'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2) > td(0)
-    control['polling'] = dt.now() - dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2) < td(0) and not control['waiting']
+    control['waiting'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2)) < td(0)
+    control['polling'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2)) < td(0) and not control['waiting']
     control['closed'] = not control['waiting'] and not control ['polling']
     return control
     
@@ -115,7 +115,7 @@ def main():
             print(f"[{dt.now()}] ✅ Control updated")
         except Exception as e:
             print(f"[{dt.now()}] ❌ Error: {e}")
-        time.sleep(600)  # спим 10 минут
+        time.sleep(60*60)  # спим 1 час
 
 if __name__ == "__main__":
     main()
