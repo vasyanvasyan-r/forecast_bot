@@ -9,7 +9,7 @@ import os
 
 from states.user_states import AuthStates
 from keyboards.menu import auth_menu
-from utils.storage import auth_dict, authorized_users, DATA_DIR
+from utils.storage import auth_dict, authorized_users, DATA_DIR, all_forecasts
 
 router = Router()
 
@@ -75,6 +75,7 @@ async def check_password(message: types.Message, state: FSMContext):
 
     if auth_dict.get(nickname) == password:
         authorized_users[message.from_user.id] = nickname
+        all_forecasts[nickname] = []
         await message.answer("✅ Авторизация успешна!", reply_markup=auth_menu)
         async with aiofiles.open(os.path.join(DATA_DIR, "authorized_users.json"), mode="w") as f:
             await f.write(json.dumps(authorized_users) + "\n")

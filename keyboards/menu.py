@@ -15,6 +15,13 @@ auth_menu = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+# сброс к предыдущему этапу
+back_menu = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Назад")]
+    ],
+    resize_keyboard=True
+)
 # Авторы голов и голевых передач
 players_menu = ReplyKeyboardMarkup(
     keyboard=[

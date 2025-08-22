@@ -99,7 +99,7 @@ async def scorers_handler(message: types.Message, state: FSMContext):
     if r_s == scores_types[-1]:
         r_s = 100
     if int(r_s) == 0:
-        await message.answer("Поскольку указали, что Рома не забьет, то и каличей указывать не надо")
+        await message.answer("Поскольку указали, что Рома не забьет, то и игроков не покажу, едем далее")
         await state.update_data(scorers=[])
         await state.update_data(assists=[])
         await message.answer("Кто откроет счёт? (Рома / Соперник / Так и не откроют счет):", reply_markup=openning_menu)
@@ -217,7 +217,10 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
             await message.answer(result)
 
             forecast[authorized_users[message.from_user.id]] = data
-            all_forecasts[authorized_users[message.from_user.id]] += [data]
+            try:
+                all_forecasts[authorized_users[message.from_user.id]] += [data]
+            except:
+                all_forecasts[authorized_users[message.from_user.id]] = [data]
             async with aiofiles.open(os.path.join(DATA_DIR, "forecasts.json"), mode="w") as f:
                 await f.write(json.dumps(forecast) + "\n")
             async with aiofiles.open(os.path.join(PULL_DIR, "all_forecasts.json"), mode="w") as f:
