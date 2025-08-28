@@ -8,7 +8,7 @@ from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications, authorized_users
 
 test = True
-sendmessage = True
+sendmessage = False
 if not test:
     bot = Bot(token=TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
@@ -45,16 +45,16 @@ async def on_startup(bot: Bot):
                 )
             except Exception as e:
                 print(f"Не удалось отправить {user_id}: {e}")  
-    if False:
-        for user_id in [key for key, value in reboot_notifications.items() if value == 'yes']:
-            try:
-                await bot.send_message(
-                    chat_id=user_id,
-                    text="✅ Бот запущен",
-                    reply_markup=reboot_menu
-                )
-            except Exception as e:
-                print(f"Не удалось отправить {user_id}: {e}")
+
+    for user_id in [key for key, value in reboot_notifications.items() if value == 'yes']:
+        try:
+            await bot.send_message(
+                chat_id=user_id,
+                text="✅ Бот запущен",
+                reply_markup=reboot_menu
+            )
+        except Exception as e:
+            print(f"Не удалось отправить {user_id}: {e}")
 async def main():
     await on_startup(bot)
     await dp.start_polling(bot)
