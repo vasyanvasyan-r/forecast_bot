@@ -31,7 +31,8 @@ players_menu = ReplyKeyboardMarkup(
 )
 tq_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text=f"Рома"), KeyboardButton(text=f"Болонья")]],
+        [KeyboardButton(text=f"Не банкротилась"), KeyboardButton(text=f"Банкротилась один раз")],
+        [KeyboardButton(text=f"Банкротилась дважды"), KeyboardButton(text=f"Банкротилась трижды")]],
     resize_keyboard=True
 )
 # Заготовка для голов
@@ -53,7 +54,7 @@ def scores_menu(prev_goals, scores_types = scores_types):
 # "Кто откроет счет -- меню"
 openning_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Рома"), KeyboardButton(text="Соперник"), KeyboardButton(text="Так и не откроют счет")]
+        [KeyboardButton(text="Рома"), KeyboardButton(text="Противник"), KeyboardButton(text="Так и не откроют счет")]
     ],
     resize_keyboard=True
 )

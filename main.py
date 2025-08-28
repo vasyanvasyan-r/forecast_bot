@@ -5,9 +5,10 @@ from keys.config import TOKEN, TOKEN_TEST
 
 from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
-from utils.storage import reboot_notifications
+from utils.storage import reboot_notifications, authorized_users
 
-test = False
+test = True
+sendmessage = True
 if not test:
     bot = Bot(token=TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
@@ -30,7 +31,21 @@ async def on_startup(bot: Bot):
             )
     except Exception as e:
         print(f"Не удалось отправить master: {e}")
-    if not test:
+    if sendmessage:
+        for user_id in authorized_users:
+            try:
+                await bot.send_message(
+                    chat_id=user_id,
+                    text='Поздравляем с первой победой!\n'
+                    'Выложили результаты матча и золотые баллы.\n'
+                    'По поводу таблиц "Топ-10" и "Претенденты" обновление будет позднее. Хотим более подробно расписать как всё будет работать в этих таблицах и после этого обнародуем.\n'
+                    'FORZA ROMA! ❤️💛\n\n'
+                    'Бот тоже пойдет отдохнет)',
+                    
+                )
+            except Exception as e:
+                print(f"Не удалось отправить {user_id}: {e}")  
+    if False:
         for user_id in [key for key, value in reboot_notifications.items() if value == 'yes']:
             try:
                 await bot.send_message(

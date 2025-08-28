@@ -1,11 +1,11 @@
 {
-  "m_id": "1",
+  "m_id": "2",
   "data": {
-    "date": "23.08.2025 21:45",
-    "rival": "Болонья",
-    "home": "1"
+    "date": "30.08.2025 21:45",
+    "rival": "Пиза",
+    "home": "0"
   },
-  "waiting": true,
-  "polling": false,
+  "waiting": false,
+  "polling": true,
   "closed": false
 }
