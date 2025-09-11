@@ -31,6 +31,14 @@ try:
 except Exception as e:
     print(f"Не удалось подключтся к таблицам, error: {e}")    
 
+
+
+try:
+    results = gs.open('Чемпионат прогнозистов 25/26')
+    goals_restrict = results.worksheet("Доступные авторы голов")
+    assists_restrict = results.worksheet("Доступные авторы ГП")
+except Exception as e:
+    print(f"Не удалось подключтся к таблицам, error: {e}")
 # пути в нужные директории
 ROOT_DIR = os.path.dirname(__file__)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
@@ -55,7 +63,7 @@ def save_data(data, name, dir):
     FILE_PATH = os.path.join(dir, f"{name}.json")
     tmp_file = FILE_PATH + ".tmp"
     with open(tmp_file, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+        json.dump(data, f, ensure_ascii=False, indent=4)
     os.replace(tmp_file, FILE_PATH)  # атомарная замена
 
 from functools import wraps
@@ -112,7 +120,8 @@ parsing = True
 while parsing:
     try:
         tq = fetch_data(temp_question)
-        tq = {'q': tq.loc[int(control['m_id']), 'question']}
+        tq = {'q': tq.loc[3, 'question'],
+            'a': tq.loc[3, 'answers'].split(', ')}
         print("Временный вопрос скачался")
         parsing = False
     except Exception as e:
@@ -121,6 +130,21 @@ while parsing:
         time.sleep(60)
 # control and players
 
+parsing = True
+while parsing:
+    try:
+        df = fetch_data(goals_restrict)
+        goals_restrict = df.set_index(df.columns.to_list()[0]).rename_axis(None, axis = 0).T.to_dict()
+        df = fetch_data(assists_restrict)
+        assists_restrict = df.set_index(df.columns.to_list()[0]).rename_axis(None, axis = 0).T.to_dict()
+        print("Ограничения скачались")
+        parsing = False
+    except Exception as e:
+        print(f"[{dt.now()}] ❌ Игроки Error: {e}"
+              "=== Перерыв на минуту ===")
+        time.sleep(60)
+
+
 try:
     save_data(l_players, 'players', DATA_DIR)
     print("Игроки записались")
@@ -128,10 +152,17 @@ try:
     print("Временный вопрос записался")    
     save_data(control, 'control', UTILS_DIR)
     print("Контроль записан")
+    save_data(goals_restrict, 'goals_restrict', DATA_DIR)
+    print("Ограничение на голы записалось")
+    save_data(assists_restrict, 'assists_restrict', DATA_DIR)
+    print("Ограничение на ассисты записалось")   
+
 except Exception as e:
         print(f"[{dt.now()}] ❌ Error: {e}")
 
 print(get_control(m_df))
+
+
 
 
 def main():

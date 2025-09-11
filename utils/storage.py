@@ -30,8 +30,18 @@ if len(players_list) % 2 == 1:
 
 players_list_menu = [(players_list[name1],players_list[name2]) for name1, name2 in zip(range(0,len(players_list), 2), range(1,len(players_list), 2))]
 
+def get_personal_list_of_players(search_dict, players_list_menu = players_list_menu):
+    lst = [(i[0] + f" ({search_dict[i[0]]})" if i[0] in search_dict else i[0] + f" (13)",
+            i[1] + f" ({search_dict[i[1]]})" if i[0] in search_dict else i[0] + f" (13)" if i[1] != "" else " (13)") 
+            for i in players_list_menu]
+    return lst
 # Прогнозы
-forecast = {}
+try:
+    with open(os.path.join(DATA_DIR, 'forecasts.json'), 'r', encoding='utf-8') as f:
+        forecast = json.load(f)
+        forecast = {int(k): v for k, v in forecast.items()}
+except:
+    forecast = {}
 
 forecast_trigger = ['Прогноз', 'Сделать прогноз']
 scores_types = ['0', '1', '2', '3', '4', '5', '6', '7', '8 и больше']
@@ -82,6 +92,22 @@ try:
     print(tq)
 except Exception as e:
     print(f"Временный не считался"
+          f"[{dt.now()}] ❌ Error: {e}")
+    
+try:
+    with open(os.path.join(DATA_DIR, 'goals_restrict.json'), 'r', encoding='utf-8') as f:
+        goals_restrict = json.load(f)
+    print(tq)
+except Exception as e:
+    print(f"Ограничение на голы не считался"
+          f"[{dt.now()}] ❌ Error: {e}")
+
+try:
+    with open(os.path.join(DATA_DIR, 'assists_restrict.json'), 'r', encoding='utf-8') as f:
+        assists_restrict = json.load(f)
+    print(tq)
+except Exception as e:
+    print(f"Ограничение на ассисты не считался"
           f"[{dt.now()}] ❌ Error: {e}")
 
 async def get_control(DIR = BASE_DIR):

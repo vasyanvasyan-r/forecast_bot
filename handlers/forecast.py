@@ -7,9 +7,10 @@ from datetime import datetime as dt
 
 from states.user_states import ForecastStates, MultiInputStates
 from utils.storage import authorized_users, \
-    forecast, players_list, forecast_trigger, first_scored, scores_types,\
-        DATA_DIR, PULL_DIR, get_control, tq, update_time_in_control, all_forecasts
-from keyboards.menu import auth_menu, players_menu, scores_menu, openning_menu, start_menu, tq_menu
+    forecast, forecast_trigger, first_scored, scores_types,\
+        DATA_DIR, PULL_DIR, get_control, tq, update_time_in_control, all_forecasts,\
+        goals_restrict, assists_restrict, get_personal_list_of_players
+from keyboards.menu import auth_menu, scores_menu, openning_menu, start_menu, tq_menu, get_players_menu
 
 import aiofiles
 import json
@@ -86,7 +87,10 @@ async def score_ft_roma_handler(message: types.Message, state: FSMContext):
 async def score_ft_opp_handler(message: types.Message, state: FSMContext):
     await state.update_data(r_m=message.text.strip())
 
-    await message.answer("Кто забьёт голы за Рому?", 
+    await message.answer("Кто забьёт голы за Рому?\n"
+                         "Теперь ВАШИ ограничения доступны в скобочках \\(\\) напротив фамилии футболиста\n"
+                         "То же самое, что в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)",
+                         parse_mode="MarkdownV2",
                          reply_markup= ReplyKeyboardRemove())
 
     await state.set_state(ForecastStates.entering_scorers)
@@ -106,7 +110,10 @@ async def scorers_handler(message: types.Message, state: FSMContext):
         await state.set_state(ForecastStates.entering_first_goal)
         await first_goal_handler(message, state)
     else:
-        await message.answer("Введите авторов голов", reply_markup=players_menu)
+        await message.answer("Введите авторов голов", reply_markup=
+                             await get_players_menu(goals_restrict[authorized_users[
+                                 message.from_user.id
+                             ]]))
         await state.set_state(MultiInputStates.waiting_inputs_scorers)
         await state.update_data(inputs=[]) 
 
@@ -122,10 +129,12 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
         r_s = 100
     else:
         r_s = int(r_s)
-
+    players_list = [x for xs in get_personal_list_of_players(goals_restrict[authorized_users[
+        message.from_user.id
+    ]]) for x in xs]
     if message.text in players_list:
         
-        inputs.append(message.text)
+        inputs.append(message.text.split(' ')[0])
         i += 1
         await state.update_data(inputs=inputs, scorer_count=i)
         if i == r_s:
@@ -141,7 +150,10 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
 
         await message.answer(f"Вы ввели {len(inputs)} авторов голов:\n" + "\n".join(inputs))
         await state.update_data(scorers=inputs)
-        await message.answer("Кто отдаст голевые передачи?", reply_markup=players_menu)
+        await message.answer("Кто отдаст голевые передачи?", reply_markup=
+                             await get_players_menu(assists_restrict[authorized_users[
+                                 message.from_user.id
+                             ]]))
         await state.set_state(ForecastStates.entering_assists)
         await assists_handler(message, state)
         return
@@ -150,7 +162,10 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
 # 4. Ассисты
 @router.message(ForecastStates.entering_assists)
 async def assists_handler(message: types.Message, state: FSMContext):
-    await message.answer("Введите авторов голевых передач", reply_markup=players_menu)
+    await message.answer("Введите авторов голевых передач", reply_markup=
+                         await get_players_menu(assists_restrict[authorized_users[
+                                 message.from_user.id
+                             ]]))
     await state.set_state(MultiInputStates.waiting_inputs_assists)
     await state.update_data(inputs=[])
     
@@ -164,9 +179,13 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
         r_s = 100
     else:
         r_s = int(r_s)
+
+    players_list = [x for xs in get_personal_list_of_players(assists_restrict[authorized_users[
+        message.from_user.id
+    ]]) for x in xs]
     if message.text in players_list:
 
-        inputs.append(message.text)
+        inputs.append(message.text.split(' ')[0])
         i += 1
         await state.update_data(inputs=inputs, assist_count=i)
         if i == r_s:
@@ -212,7 +231,8 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
                 f"▪ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
                 f"▪ Голы: {data['scorers']}\n"
                 f"▪ Ассисты: {data['assists']}\n"
-                f"▪ Первый гол: {data['first_scored']}"
+                f"▪ Первый гол: {data['first_scored']}\n"
+                f"▪ Временный вопрос: {data['coach']}"
             )
             await message.answer(result)
 
