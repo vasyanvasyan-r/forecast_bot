@@ -78,7 +78,7 @@ async def check_password(message: types.Message, state: FSMContext):
         all_forecasts[nickname] = []
         await message.answer("✅ Авторизация успешна!", reply_markup=auth_menu)
         async with aiofiles.open(os.path.join(DATA_DIR, "authorized_users.json"), mode="w") as f:
-            await f.write(json.dumps(authorized_users) + "\n")
+            await f.write(json.dumps(authorized_users, indent=4))
         await state.clear()
     else:
         await message.answer("❌ Неверное кодовое слово. Попробуйте снова:")

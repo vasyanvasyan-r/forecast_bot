@@ -29,7 +29,7 @@ if len(players_list) % 2 == 1:
     players_list += ['']
 
 players_list_menu = [(players_list[name1],players_list[name2]) for name1, name2 in zip(range(0,len(players_list), 2), range(1,len(players_list), 2))]
-
+players_dict = {k:"13" for k in players_list}
 def get_personal_list_of_players(search_dict, players_list_menu = players_list_menu):
     lst = [(i[0] + f" ({search_dict[i[0]]})" if i[0] in search_dict else i[0] + f" (13)",
             i[1] + f" ({search_dict[i[1]]})" if i[0] in search_dict else i[0] + f" (13)" if i[1] != "" else " (13)") 
