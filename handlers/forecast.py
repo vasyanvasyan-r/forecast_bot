@@ -22,6 +22,7 @@ router = Router()
 # Старт прогноза
 @router.message(StateFilter(None), lambda message: message.text in forecast_trigger)
 async def start_forecast(message: types.Message, state: FSMContext):
+    assert message.from_user is not None
     user_id = message.from_user.id
     if user_id not in authorized_users:
         await message.answer("Сначала пройдите авторизацию.",
@@ -51,6 +52,7 @@ async def start_forecast(message: types.Message, state: FSMContext):
 
 @router.message(ForecastStates.temp_question)
 async def temp_q_parsing(message: types.Message, state: FSMContext):
+    assert message.text is not None
     await state.update_data(coach=message.text.strip())
 
     await message.answer("Сколько забьет Рома в первом тайме?",
@@ -59,6 +61,7 @@ async def temp_q_parsing(message: types.Message, state: FSMContext):
 # 1. Счёт первого тайма
 @router.message(ForecastStates.roma_score_fh)
 async def score_fh_roma_handler(message: types.Message, state: FSMContext):
+    assert message.text is not None
     await state.update_data(r_s_fh=message.text.strip())
 
     await message.answer("Сколько пропустит Рома в первом тайме?",
@@ -67,6 +70,7 @@ async def score_fh_roma_handler(message: types.Message, state: FSMContext):
 
 @router.message(ForecastStates.rival_score_fh)
 async def score_fh_opp_handler(message: types.Message, state: FSMContext):
+    assert message.text is not None
     await state.update_data(r_m_fh=message.text.strip())
 
     await message.answer("Сколько Рома забьет за матч?",
@@ -76,6 +80,7 @@ async def score_fh_opp_handler(message: types.Message, state: FSMContext):
 # 2. Счёт полного матча
 @router.message(ForecastStates.roma_score_ft)
 async def score_ft_roma_handler(message: types.Message, state: FSMContext):
+    assert message.text is not None
     await state.update_data(r_s=message.text.strip())
 
     await message.answer("Сколько Рома пропустит за матч", 
@@ -85,6 +90,7 @@ async def score_ft_roma_handler(message: types.Message, state: FSMContext):
 
 @router.message(ForecastStates.rival_score_ft)
 async def score_ft_opp_handler(message: types.Message, state: FSMContext):
+    assert message.text is not None
     await state.update_data(r_m=message.text.strip())
 
     await message.answer("Кто забьёт голы за Рому?\n"
@@ -110,6 +116,7 @@ async def scorers_handler(message: types.Message, state: FSMContext):
         await state.set_state(ForecastStates.entering_first_goal)
         await first_goal_handler(message, state)
     else:
+        assert message.from_user is not None
         if authorized_users[message.from_user.id] in goals_restrict:
 
             await message.answer("Кто станет авторами голов?", reply_markup=
@@ -135,6 +142,7 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
     else:
         r_s = int(r_s)
     players_list = [k for k in players_dict]
+    assert message.text is not None
     text = message.text.split(' (')[0]
     if text in players_list:
         
@@ -154,23 +162,25 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
 
         await message.answer(f"Вы ввели {len(inputs)} авторов голов:\n" + "\n".join(inputs))
         await state.update_data(scorers=inputs)
+        assert message.from_user is not None
         if authorized_users[message.from_user.id] in assists_restrict:
-
             await message.answer("Кто отдаст голевые передачи?", reply_markup=
                                 await get_players_menu(assists_restrict[authorized_users[
+                                    
                                     message.from_user.id
                                 ]]))
         else:
             await message.answer("Кто отдаст голевые передачи?", reply_markup=
                                 await get_players_menu({k:"13" for k in players_dict}))            
-        await state.set_state(ForecastStates.entering_assists)
-        await assists_handler(message, state)
+        await state.set_state(MultiInputStates.waiting_inputs_assists)
+        await state.update_data(inputs=[])
         return
 
 
 # 4. Ассисты
 @router.message(ForecastStates.entering_assists)
 async def assists_handler(message: types.Message, state: FSMContext):
+    assert message.from_user is not None
     if authorized_users[message.from_user.id] in assists_restrict:
 
         await message.answer("Кто отдаст голевые передачи?", reply_markup=
@@ -196,6 +206,7 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
         r_s = int(r_s)
 
     players_list = [k for k in players_dict]
+    assert message.text is not None
     text = message.text.split(' (')[0]
     if text in players_list:
 
@@ -249,7 +260,7 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
                 f"▪ Временный вопрос: {data['coach']}"
             )
             await message.answer(result)
-
+            assert message.from_user is not None
             forecast[authorized_users[message.from_user.id]] = data
             try:
                 all_forecasts[authorized_users[message.from_user.id]] += [data]

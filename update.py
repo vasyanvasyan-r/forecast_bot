@@ -1,12 +1,20 @@
 import pandas as pd
 import numpy as np
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
-#API creditails
+from google.oauth2.service_account import Credentials  # <-- вместо oauth2client
+
+# API credentials
 path_to_credential = 'keys/credentials.json'
-scope = ['https://spreadsheets.google.com/feeds',
-         'https://www.googleapis.com/auth/drive']
-credentials = ServiceAccountCredentials.from_json_keyfile_name(path_to_credential, scope)
+scope = [
+    'https://spreadsheets.google.com/feeds',
+    'https://www.googleapis.com/auth/drive'
+]
+
+# Создаём объект Credentials
+credentials = Credentials.from_service_account_file(
+    path_to_credential,
+    scopes=scope
+)
 
 from datetime import datetime as dt
 from datetime import timedelta as td
@@ -15,12 +23,14 @@ import time
 import json
 import os
 
+# Авторизация gspread
 try:
     gs = gspread.authorize(credentials)
 except Exception as e:
     print(f"Не удалось авторизоваться в GoogleAPI, error: {e}")
+
+# Подгрузка таблиц
 try:
-    # подгрузим таблицы из Данный и Чемпионат прогнозистов
     control = gs.open('Данные')
     matches = control.worksheet("матчи")
     result_m = control.worksheet("результаты")
@@ -29,7 +39,8 @@ try:
     gp_logs = control.worksheet("логи золотых баллов")
     print("Данные загружены")
 except Exception as e:
-    print(f"Не удалось подключтся к таблицам, error: {e}")    
+    print(f"Не удалось подключтся к таблицам, error: {e}")
+ 
 
 
 
@@ -120,8 +131,8 @@ parsing = True
 while parsing:
     try:
         tq = fetch_data(temp_question)
-        tq = {'q': tq.loc[3, 'question'],
-            'a': tq.loc[3, 'answers'].split(', ')}
+        tq = {'q': tq.loc[int(control['m_id']), 'question'],
+            'a': tq.loc[int(control['m_id']), 'answers'].split(', ')}  # type: ignore
         print("Временный вопрос скачался")
         parsing = False
     except Exception as e:

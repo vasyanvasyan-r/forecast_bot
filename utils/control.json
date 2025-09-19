@@ -1,9 +1,9 @@
 {
-    "m_id": "3",
+    "m_id": "4",
     "data": {
-        "date": "13.09.2025 13:30",
-        "rival": "Торино",
-        "home": "1"
+        "date": "21.09.2025 10:30",
+        "rival": "Лацио",
+        "home": "0"
     },
     "waiting": false,
     "polling": true,
