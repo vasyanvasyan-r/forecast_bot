@@ -9,7 +9,7 @@ from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications, authorized_users
 
-test = True
+test = False
 sendmessage = True
 if not test:
     bot = Bot(token=TOKEN)
