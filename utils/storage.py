@@ -9,6 +9,13 @@ DATA_DIR = os.path.join(BASE_DIR, '..', 'data')
 PULL_DIR = os.path.join(BASE_DIR, '..', 'pull_data')
 print(PULL_DIR)
 
+
+try:
+    with open(os.path.join(BASE_DIR, 'control.json'), 'r', encoding='utf-8') as f:
+        control = json.load(f)
+    print('Загрузил контрольные переменные')
+except:
+    print("Не загрузил контроль")
 # Авторизованные пользователи
 try:
     with open(os.path.join(DATA_DIR, 'authorized_users.json'), 'r', encoding='utf-8') as f:
@@ -37,7 +44,7 @@ def get_personal_list_of_players(search_dict, players_list_menu = players_list_m
     return lst
 # Прогнозы
 try:
-    with open(os.path.join(DATA_DIR, 'forecasts.json'), 'r', encoding='utf-8') as f:
+    with open(os.path.join(DATA_DIR, f'forecast_{control["m_id"]}.json'), 'r', encoding='utf-8') as f:
         forecast = json.load(f)
         forecast = {int(k): v for k, v in forecast.items()}
 except:

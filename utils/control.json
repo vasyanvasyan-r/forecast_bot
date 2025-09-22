@@ -1,11 +1,11 @@
 {
-    "m_id": "4",
+    "m_id": 5,
     "data": {
-        "date": "21.09.2025 10:30",
-        "rival": "Лацио",
+        "date": "24.09.2025 22:00",
+        "rival": "Ницца",
         "home": "0"
     },
-    "waiting": false,
-    "polling": true,
+    "waiting": true,
+    "polling": false,
     "closed": false
 }

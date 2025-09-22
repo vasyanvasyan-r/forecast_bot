@@ -63,7 +63,7 @@ def fetch_data(sheet):
     return pd.DataFrame(data, columns = data.pop(0))
 def get_control(df):
     control = {}
-    control['m_id'] = df.loc[[dt.strptime(i, "%d.%m.%Y %H:%M") > dt.now() for i in df.date] ,'match_id'].min()
+    control['m_id'] = df.loc[[dt.strptime(i, "%d.%m.%Y %H:%M") > dt.now() if i != '' else True for i in df.date] ,'match_id'].astype(int).min().item()
     control['data'] = df.loc[int(control['m_id']), ['date', 'rival', 'home']].to_dict()
     control['waiting'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(days=2)) < td(0)
     control['polling'] = dt.now() - (dt.strptime(control['data']['date'], "%d.%m.%Y %H:%M") - td(hours=2)) < td(0) and not control['waiting']

@@ -266,7 +266,7 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
                 all_forecasts[authorized_users[message.from_user.id]] += [data]
             except:
                 all_forecasts[authorized_users[message.from_user.id]] = [data]
-            async with aiofiles.open(os.path.join(DATA_DIR, "forecasts.json"), mode="w") as f:
+            async with aiofiles.open(os.path.join(DATA_DIR, f'forecast_{control["m_id"]}.json'), mode="w") as f:
                 await f.write(json.dumps(forecast, indent=4))
             async with aiofiles.open(os.path.join(PULL_DIR, "all_forecasts.json"), mode="w") as f:
                 await f.write(json.dumps(all_forecasts, indent = 4))
