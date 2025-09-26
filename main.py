@@ -40,7 +40,7 @@ async def on_startup(bot: Bot):
                     chat_id=user_id,
                     text="""
 Привет, наш дорогой Прогнозист\\!
-Бот запущен и готов принять прогнозы на игру против Ниццы\\. Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча\\.
+Бот запущен и готов принять прогнозы на игру против Вероны\\. Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча\\.
 
 Вот наш [Гайд](https://docs.google.com/document/d/1K7zAyX-6zEeMXGZAaAY59QjVyFsZpyNQgw1dZ4_dXBw/edit?tab=t.0)
 Вот наши Таблицы [Прогнозиста](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1893944730#gid=1893944730)

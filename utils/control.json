@@ -1,11 +1,11 @@
 {
-    "m_id": 5,
+    "m_id": 6,
     "data": {
-        "date": "24.09.2025 22:00",
-        "rival": "Ницца",
-        "home": "0"
+        "date": "28.09.2025 16:00",
+        "rival": "Верона",
+        "home": "1"
     },
-    "waiting": true,
-    "polling": false,
+    "waiting": false,
+    "polling": true,
     "closed": false
 }
