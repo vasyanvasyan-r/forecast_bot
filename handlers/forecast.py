@@ -52,12 +52,21 @@ async def start_forecast(message: types.Message, state: FSMContext):
 
 @router.message(ForecastStates.temp_question)
 async def temp_q_parsing(message: types.Message, state: FSMContext):
-    assert message.text is not None
-    await state.update_data(coach=message.text.strip())
+    answer = message.text.strip()
+    assert answer is not None, "Сломался путь, пользователь оказался здесь случайно"
+    if answer in tq['a']:
 
-    await message.answer("Сколько забьет Рома в первом тайме?",
-                         reply_markup = scores_menu('0'))
-    await state.set_state(ForecastStates.roma_score_fh)
+        await state.update_data(coach=message.text.strip())
+
+        await message.answer("Сколько забьет Рома в первом тайме?",
+                            reply_markup = scores_menu('0'))
+        await state.set_state(ForecastStates.roma_score_fh)
+    else:
+
+        await message.answer("Нет такого варианта, воспользуйтесь меню ввода",
+                            reply_markup=tq_menu)
+        await state.set_state(ForecastStates.temp_question)
+
 # 1. Счёт первого тайма
 @router.message(ForecastStates.roma_score_fh)
 async def score_fh_roma_handler(message: types.Message, state: FSMContext):
@@ -107,7 +116,7 @@ async def score_ft_opp_handler(message: types.Message, state: FSMContext):
 async def scorers_handler(message: types.Message, state: FSMContext):
     r_s = (await state.get_data())['r_s']
     if r_s == scores_types[-1]:
-        r_s = 100
+        r_s = 8
     if int(r_s) == 0:
         await message.answer("Поскольку указали, что Рома не забьет, то и игроков не покажу, едем далее")
         await state.update_data(scorers=[])
@@ -138,7 +147,7 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
     i = data.get("scorer_count", 0)  # достаём текущий счётчик
     r_s = data['r_s']
     if r_s == scores_types[-1]:
-        r_s = 100
+        r_s = 8
     else:
         r_s = int(r_s)
     players_list = [k for k in players_dict]
@@ -201,7 +210,7 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
     i = data.get("assist_count", 0)  # достаём текущий счётчик
     r_s = data['r_s']
     if r_s == scores_types[-1]:
-        r_s = 100
+        r_s = 8
     else:
         r_s = int(r_s)
 
@@ -252,12 +261,20 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
             data = await state.get_data()
             result = (
                 f"✅ Ваш прогноз:\n"
-                f"▪ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} {control['data']['rival']}\n"
-                f"▪ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
-                f"▪ Голы: {data['scorers']}\n"
-                f"▪ Ассисты: {data['assists']}\n"
-                f"▪ Первый гол: {data['first_scored']}\n"
-                f"▪ Временный вопрос: {data['coach']}"
+                f"½ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} {control['data']['rival']}\n"
+                f"⏱ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
+                f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                f"🥅 Первый гол: {data['first_scored']}\n"
+                f"❓ Временный вопрос: {data['coach']}"
+            ) if control['data']['home'] == '1' else (
+                f"✅ Ваш прогноз:\n"
+                f"½ Счёт первого тайма: {data['r_m_fh']} {control['data']['rival']} -- Рома {data['r_s_fh']}\n"
+                f"⏱ Счёт матча: {data['r_m']} {control['data']['rival']} -- Рома {data['r_s']}\n"
+                f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                f"🥅 Первый гол: {data['first_scored']}\n"
+                f"❓ Временный вопрос: {data['coach']}"
             )
             await message.answer(result)
             assert message.from_user is not None
