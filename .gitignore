@@ -24,6 +24,7 @@ data/forecasts.json
 data/
 git_ignore.md
 data/dict_with_codes.json
+dict_with_codes.json
 testing.ipynb
 pull_data/all_forecasts.json
 
