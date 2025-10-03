@@ -26,8 +26,9 @@ git_ignore.md
 data/dict_with_codes.json
 testing.ipynb
 pull_data/all_forecasts.json
-utils/control.json
+
 data/players.json
+utils/*.json
 
 # --- OS-specific ---
 .DS_Store
