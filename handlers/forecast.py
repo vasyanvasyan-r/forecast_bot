@@ -52,11 +52,11 @@ async def start_forecast(message: types.Message, state: FSMContext):
 
 @router.message(ForecastStates.temp_question)
 async def temp_q_parsing(message: types.Message, state: FSMContext):
-    answer = message.text.strip()
+    answer = message.text.strip() # type: ignore
     assert answer is not None, "Сломался путь, пользователь оказался здесь случайно"
     if answer in tq['a']:
 
-        await state.update_data(coach=message.text.strip())
+        await state.update_data(coach=message.text.strip()) # type: ignore
 
         await message.answer("Сколько забьет Рома в первом тайме?",
                             reply_markup = scores_menu('0'))
@@ -269,7 +269,7 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
                 f"❓ Временный вопрос: {data['coach']}"
             ) if control['data']['home'] == '1' else (
                 f"✅ Ваш прогноз:\n"
-                f"½ Счёт первого тайма: {data['r_m_fh']} {control['data']['rival']} -- Рома {data['r_s_fh']}\n"
+                f"½ Счёт первого тайма:  {control['data']['rival']} {data['r_m_fh']} -- {data['r_s_fh']} Рома\n"
                 f"⏱ Счёт матча: {data['r_m']} {control['data']['rival']} -- Рома {data['r_s']}\n"
                 f"⚽️ Голы: {', '.join(data['scorers'])}\n"
                 f"🎯 Ассисты: {', '.join(data['assists'])}\n"
