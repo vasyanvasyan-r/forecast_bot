@@ -10,7 +10,7 @@ from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications, authorized_users
 
 test = False
-sendmessage = True
+sendmessage = False
 if not test:
     bot = Bot(token=TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
