@@ -10,7 +10,7 @@ from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications, authorized_users
 
 test = False
-sendmessage = False
+sendmessage = True
 if not test:
     bot = Bot(token=TOKEN)
     dp = Dispatcher(storage=MemoryStorage())
@@ -40,7 +40,7 @@ async def on_startup(bot: Bot):
                     chat_id=user_id,
                     text="""
 Привет, наш дорогой Прогнозист\\!
-Бот готов принимать прогнозы на матч против Интера\\. Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча\\.
+Бот готов принимать прогнозы на матч против Виктории\\. Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча\\.
 
 Вот наш [Гайд](https://docs.google.com/document/d/1K7zAyX-6zEeMXGZAaAY59QjVyFsZpyNQgw1dZ4_dXBw/edit?tab=t.0)
 Вот наши Таблицы [Прогнозиста](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1893944730#gid=1893944730)
