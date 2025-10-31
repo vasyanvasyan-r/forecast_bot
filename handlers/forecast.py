@@ -270,7 +270,7 @@ async def first_goal_handler(message: types.Message, state: FSMContext):
             ) if control['data']['home'] == '1' else (
                 f"✅ Ваш прогноз:\n"
                 f"½ Счёт первого тайма:  {control['data']['rival']} {data['r_m_fh']} -- {data['r_s_fh']} Рома\n"
-                f"⏱ Счёт матча: {data['r_m']} {control['data']['rival']} -- Рома {data['r_s']}\n"
+                f"⏱ Счёт матча: {control['data']['rival']} {data['r_m']} -- {data['r_s']} Рома\n"
                 f"⚽️ Голы: {', '.join(data['scorers'])}\n"
                 f"🎯 Ассисты: {', '.join(data['assists'])}\n"
                 f"🥅 Первый гол: {data['first_scored']}\n"
