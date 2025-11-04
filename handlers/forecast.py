@@ -157,7 +157,8 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
         
         inputs.append(text)
         i += 1
-        await state.update_data(inputs=inputs, scorer_count=i)
+        if i <= r_s:
+            await state.update_data(inputs=inputs, scorer_count=i)
         if i == r_s:
             await message.answer(f"Принято ({i}/{r_s}).")
         else:
@@ -221,7 +222,8 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
 
         inputs.append(text)
         i += 1
-        await state.update_data(inputs=inputs, assist_count=i)
+        if i <= r_s:
+            await state.update_data(inputs=inputs, assist_count=i)
         if i == r_s:
             await message.answer(f"Принято ({i}/{r_s}).")
         else:
