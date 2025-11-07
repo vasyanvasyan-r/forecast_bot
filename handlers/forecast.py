@@ -114,16 +114,63 @@ async def score_ft_opp_handler(message: types.Message, state: FSMContext):
 # 3. Автор голов
 @router.message(ForecastStates.entering_scorers)
 async def scorers_handler(message: types.Message, state: FSMContext):
-    r_s = (await state.get_data())['r_s']
+    data = await state.get_data()
+    r_s, r_m = data['r_s'], int(data['r_m'])
     if r_s == scores_types[-1]:
         r_s = 8
     if int(r_s) == 0:
-        await message.answer("Поскольку указали, что Рома не забьет, то и игроков не покажу, едем далее")
+        await message.answer("Поскольку указали, что Рома не забьет, то и игроков не покажу, Вот ваш прогноз")
         await state.update_data(scorers=[])
         await state.update_data(assists=[])
-        await message.answer("Кто откроет счёт? (Рома / Соперник / Так и не откроют счет):", reply_markup=openning_menu)
-        await state.set_state(ForecastStates.entering_first_goal)
-        await first_goal_handler(message, state)
+
+        try:
+            control = await get_control()
+        except:
+            print("Использую стартовую версию контрольного словаря")
+        control = await update_time_in_control(control) # type: ignore
+
+        if control['closed']:
+            await state.clear()
+            await message.answer(f"Прогнозы не принимаются. Меньше двух часов. Матч в {control['data']['date']}", 
+                                reply_markup=auth_menu)
+        else:        
+            if r_m > 0:
+                await state.update_data(first_scored=first_scored[1])
+            else:
+                await state.update_data(first_scored=first_scored[2])
+            await state.update_data(timestamp=dt.now().strftime('%d-%m-%Y %H:%M:%S-%f'))
+            data = await state.get_data()
+            result = (
+                f"✅ Ваш прогноз:\n"
+                f"½ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} {control['data']['rival']}\n"
+                f"⏱ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
+                f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                f"🥅 Первый гол: {data['first_scored']}\n"
+                f"❓ Временный вопрос: {data['coach']}"
+            ) if control['data']['home'] == '1' else (
+                f"✅ Ваш прогноз:\n"
+                f"½ Счёт первого тайма:  {control['data']['rival']} {data['r_m_fh']} -- {data['r_s_fh']} Рома\n"
+                f"⏱ Счёт матча: {control['data']['rival']} {data['r_m']} -- {data['r_s']} Рома\n"
+                f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                f"🥅 Первый гол: {data['first_scored']}\n"
+                f"❓ Временный вопрос: {data['coach']}"
+            )
+            await message.answer(result)
+            assert message.from_user is not None
+            forecast[authorized_users[message.from_user.id]] = data
+            try:
+                all_forecasts[authorized_users[message.from_user.id]] += [data]
+            except:
+                all_forecasts[authorized_users[message.from_user.id]] = [data]
+            async with aiofiles.open(os.path.join(DATA_DIR, f'forecast_{control["m_id"]}.json'), mode="w") as f:
+                await f.write(json.dumps(forecast, indent=4))
+            async with aiofiles.open(os.path.join(PULL_DIR, "all_forecasts.json"), mode="w") as f:
+                await f.write(json.dumps(all_forecasts, indent = 4))
+            await state.clear()
+            await message.answer("Прогноз записан", reply_markup=auth_menu)                  
+
     else:
         assert message.from_user is not None
         if authorized_users[message.from_user.id] in goals_restrict:
@@ -236,12 +283,106 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
     if message.text.lower() == "закончить ввод" or i == r_s:
 
         await message.answer(f"Вы ввели {len(inputs)} авторов голевых передач, по именам:\n" + "\n".join(inputs))
-        
         await state.update_data(assists=inputs)
-        await message.answer("Кто откроет счёт? (Рома / Соперник / Так и не откроют счет):", reply_markup=openning_menu)
-        await state.set_state(ForecastStates.entering_first_goal)
+        r_s_fh, r_m_fh, r_m = int(data['r_s_fh']), int(data['r_m_fh']), int(data['r_m'])
+        cond_roma = (r_s > 0 and r_m == 0) or (r_s_fh > 0 and r_m_fh == 0)
+        cond_rival = (r_s == 0 and r_m > 0) or (r_s_fh == 0 and r_m_fh > 0)
+        try:
+            control = await get_control()
+        except:
+            print("Использую стартовую версию контрольного словаря")
+        if cond_roma:
+            control = await update_time_in_control(control) # type: ignore
+
+            if control['closed']:
+                await state.clear()
+                await message.answer(f"Прогнозы не принимаются. Меньше двух часов. Матч в {control['data']['date']}", 
+                                    reply_markup=auth_menu)
+            else:        
+
+                await state.update_data(first_scored=first_scored[0])
+                await state.update_data(timestamp=dt.now().strftime('%d-%m-%Y %H:%M:%S-%f'))
+                data = await state.get_data()
+                result = (
+                    f"✅ Ваш прогноз:\n"
+                    f"½ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} {control['data']['rival']}\n"
+                    f"⏱ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
+                    f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                    f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                    f"🥅 Первый гол: {data['first_scored']}\n"
+                    f"❓ Временный вопрос: {data['coach']}"
+                ) if control['data']['home'] == '1' else (
+                    f"✅ Ваш прогноз:\n"
+                    f"½ Счёт первого тайма:  {control['data']['rival']} {data['r_m_fh']} -- {data['r_s_fh']} Рома\n"
+                    f"⏱ Счёт матча: {control['data']['rival']} {data['r_m']} -- {data['r_s']} Рома\n"
+                    f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                    f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                    f"🥅 Первый гол: {data['first_scored']}\n"
+                    f"❓ Временный вопрос: {data['coach']}"
+                )
+                await message.answer(result)
+                assert message.from_user is not None
+                forecast[authorized_users[message.from_user.id]] = data
+                try:
+                    all_forecasts[authorized_users[message.from_user.id]] += [data]
+                except:
+                    all_forecasts[authorized_users[message.from_user.id]] = [data]
+                async with aiofiles.open(os.path.join(DATA_DIR, f'forecast_{control["m_id"]}.json'), mode="w") as f:
+                    await f.write(json.dumps(forecast, indent=4))
+                async with aiofiles.open(os.path.join(PULL_DIR, "all_forecasts.json"), mode="w") as f:
+                    await f.write(json.dumps(all_forecasts, indent = 4))
+                await state.clear()
+                await message.answer("Прогноз записан", reply_markup=auth_menu)
+        elif cond_rival:
+            control = await update_time_in_control(control) # type: ignore
+
+            if control['closed']:
+                await state.clear()
+                await message.answer(f"Прогнозы не принимаются. Меньше двух часов. Матч в {control['data']['date']}", 
+                                    reply_markup=auth_menu)
+            else:        
+
+                await state.update_data(first_scored=first_scored[1])
+                await state.update_data(timestamp=dt.now().strftime('%d-%m-%Y %H:%M:%S-%f'))
+                data = await state.get_data()
+                result = (
+                    f"✅ Ваш прогноз:\n"
+                    f"½ Счёт первого тайма: Рома {data['r_s_fh']} -- {data['r_m_fh']} {control['data']['rival']}\n"
+                    f"⏱ Счёт матча: Рома {data['r_s']} -- {data['r_m']} {control['data']['rival']}\n"
+                    f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                    f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                    f"🥅 Первый гол: {data['first_scored']}\n"
+                    f"❓ Временный вопрос: {data['coach']}"
+                ) if control['data']['home'] == '1' else (
+                    f"✅ Ваш прогноз:\n"
+                    f"½ Счёт первого тайма:  {control['data']['rival']} {data['r_m_fh']} -- {data['r_s_fh']} Рома\n"
+                    f"⏱ Счёт матча: {control['data']['rival']} {data['r_m']} -- {data['r_s']} Рома\n"
+                    f"⚽️ Голы: {', '.join(data['scorers'])}\n"
+                    f"🎯 Ассисты: {', '.join(data['assists'])}\n"
+                    f"🥅 Первый гол: {data['first_scored']}\n"
+                    f"❓ Временный вопрос: {data['coach']}"
+                )
+                await message.answer(result)
+                assert message.from_user is not None
+                forecast[authorized_users[message.from_user.id]] = data
+                try:
+                    all_forecasts[authorized_users[message.from_user.id]] += [data]
+                except:
+                    all_forecasts[authorized_users[message.from_user.id]] = [data]
+                async with aiofiles.open(os.path.join(DATA_DIR, f'forecast_{control["m_id"]}.json'), mode="w") as f:
+                    await f.write(json.dumps(forecast, indent=4))
+                async with aiofiles.open(os.path.join(PULL_DIR, "all_forecasts.json"), mode="w") as f:
+                    await f.write(json.dumps(all_forecasts, indent = 4))
+                await state.clear()
+                await message.answer("Прогноз записан", reply_markup=auth_menu)            
+            
+        else:
+            await message.answer("Кто откроет счёт? (Рома / Соперник / Так и не откроют счет):", reply_markup=openning_menu)
+            await state.set_state(ForecastStates.entering_first_goal)
+
 
 # 5. Кто откроет счёт
+#first_scored = ['Рома', 'Противник', 'Так и не откроют счет']
 @router.message(ForecastStates.entering_first_goal)
 async def first_goal_handler(message: types.Message, state: FSMContext):
 

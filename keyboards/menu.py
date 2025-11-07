@@ -64,7 +64,7 @@ def scores_menu(prev_goals, scores_types = scores_types):
 # "Кто откроет счет -- меню"
 openning_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Рома"), KeyboardButton(text="Противник"), KeyboardButton(text="Так и не откроют счет")]
+        [KeyboardButton(text="Рома"), KeyboardButton(text="Противник")]
     ],
     resize_keyboard=True
 )
