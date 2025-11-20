@@ -31,16 +31,21 @@ with open(os.path.join(DATA_DIR, 'dict_with_codes.json'), 'r', encoding='utf-8')
 # загрузка игроков
 with open(os.path.join(DATA_DIR, 'players.json'), 'r', encoding='utf-8') as f:
     players_list = json.load(f)
-# заготовка для меню игроков
-if len(players_list) % 2 == 1:
-    players_list += ['']
 
-players_list_menu = [(players_list[name1],players_list[name2]) for name1, name2 in zip(range(0,len(players_list), 2), range(1,len(players_list), 2))]
+players_list_menu = [(players_list[name1],players_list[name2]) for name1, name2 in zip(range(0,len(players_list if len(players_list) % 2 != 1 else players_list + ['']), 2), 
+                                                                                       range(1,len(players_list if len(players_list) % 2 != 1 else players_list + ['']), 2))]
 players_dict = {k:"13" for k in players_list}
-def get_personal_list_of_players(search_dict, players_list_menu = players_list_menu):
+def get_personal_list_of_players(search_dict, players_list = players_list):
+    drop_players = [k for k, v in search_dict.items() if v == '0']
+    personal_players_list = [item for item in players_list if item not in drop_players]
+    if len(personal_players_list) % 2 == 1:
+        personal_players_list += ['']
+    personal_players_list = [(personal_players_list[name1],
+                              personal_players_list[name2]) for name1, name2 in zip(range(0,len(personal_players_list), 2), 
+                                                                                    range(1,len(personal_players_list), 2))]
     lst = [(i[0] + f" ({search_dict[i[0]]})" if i[0] in search_dict else i[0] + f" (13)",
             i[1] + f" ({search_dict[i[1]]})" if i[1] in search_dict else i[1] + f" (13)" if i[1] != "" else " (13)") 
-            for i in players_list_menu]
+            for i in personal_players_list]
     return lst
 # Прогнозы
 try:

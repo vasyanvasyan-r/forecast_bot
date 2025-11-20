@@ -200,7 +200,9 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
     players_list = [k for k in players_dict]
     assert message.text is not None
     text = message.text.split(' (')[0]
-    if text in players_list:
+
+    drop_players = [k for k, v in goals_restrict[authorized_users[message.from_user.id]].items() if v == '0']  # type: ignore
+    if text in players_list and text not in drop_players:
         
         inputs.append(text)
         i += 1
@@ -212,6 +214,8 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
             await message.answer(f"Принято ({i}/{r_s}). Ещё?")
     elif message.text.lower() == "закончить ввод":                
         await message.answer("Понял, принял, записал")
+    elif text in drop_players:
+        await message.answer("У вас закончились возможности упомянуть этого футболиста, в списке перечислены все доступные футболисты. Воспользуйтесь списком.")
     else:
         await message.answer("Нет такого футболиста, воспользуйтесь списком")
 
@@ -265,7 +269,9 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
     players_list = [k for k in players_dict]
     assert message.text is not None
     text = message.text.split(' (')[0]
-    if text in players_list:
+
+    drop_players = [k for k, v in assists_restrict[authorized_users[message.from_user.id]].items() if v == '0']  # type: ignore
+    if text in players_list and text not in drop_players:
 
         inputs.append(text)
         i += 1
@@ -277,6 +283,8 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
             await message.answer(f"Принято ({i}/{r_s}). Ещё?")
     elif message.text.lower() == "закончить ввод":                
         await message.answer("Понял, принял, записал")
+    elif text in drop_players:
+        await message.answer("У вас закончились возможности упомянуть этого футболиста, в списке перечислены все доступные футболисты. Воспользуйтесь списком.")
     else:
         await message.answer("Нет такого футболиста, воспользуйтесь списком")
     
