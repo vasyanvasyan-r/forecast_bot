@@ -4,7 +4,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from keys.config import TOKEN, TOKEN_TEST
 from aiogram.types import ReplyKeyboardRemove, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
-
+from states.user_states import ForecastStates, MultiInputStates, NotificationsStates
+from aiogram.filters import StateFilter
 from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications, authorized_users
@@ -24,7 +25,8 @@ dp.include_router(forecast.router)
 dp.include_router(notifications.router)
 
 
-async def on_startup(bot: Bot):
+async def on_startup(bot: Bot, ):
+    
     try:
         await bot.send_message(
                 chat_id=166853396,
@@ -40,7 +42,7 @@ async def on_startup(bot: Bot):
                     chat_id=user_id,
                     text=(
                         "Привет, наш дорогой <b>Прогнозист</b>!\n"
-                        "Бот готов принимать прогнозы на матч против Кремонезе. Обратите внимание на Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча.\n\n"
+                        "Бот готов принимать прогнозы на матч против Митьюлланда. Обратите внимание на Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча.\n\n"
 
                         "Вот наш <a href='https://docs.google.com/document/d/1K7zAyX-6zEeMXGZAaAY59QjVyFsZpyNQgw1dZ4_dXBw/edit?tab=t.0'>Гайд</a>\n"
                         "Вот наши Таблицы <a href='https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1893944730#gid=1893944730'>Прогнозиста</a>\n"

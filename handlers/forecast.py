@@ -52,7 +52,7 @@ async def start_forecast(message: types.Message, state: FSMContext):
 
 @router.message(ForecastStates.temp_question)
 async def temp_q_parsing(message: types.Message, state: FSMContext):
-    answer = message.text.strip() # type: ignore
+    answer = message.text.strip()  # type: ignore
     assert answer is not None, "Сломался путь, пользователь оказался здесь случайно"
     if answer in tq['a']:
 
@@ -71,7 +71,7 @@ async def temp_q_parsing(message: types.Message, state: FSMContext):
 @router.message(ForecastStates.roma_score_fh)
 async def score_fh_roma_handler(message: types.Message, state: FSMContext):
     assert message.text is not None
-    await state.update_data(r_s_fh=message.text.strip())
+    await state.update_data(r_s_fh=int(message.text.strip()) if message.text.strip() != '8 и больше' else '8')
 
     await message.answer("Сколько пропустит Рома в первом тайме?",
                          reply_markup = scores_menu('0'))
@@ -80,31 +80,32 @@ async def score_fh_roma_handler(message: types.Message, state: FSMContext):
 @router.message(ForecastStates.rival_score_fh)
 async def score_fh_opp_handler(message: types.Message, state: FSMContext):
     assert message.text is not None
-    await state.update_data(r_m_fh=message.text.strip())
-
+    await state.update_data(r_m_fh=int(message.text.strip()) if message.text.strip() != '8 и больше' else '8')
+    prev_choice = (await state.get_data())['r_s_fh']
     await message.answer("Сколько Рома забьет за матч?",
-                         reply_markup= scores_menu((await state.get_data())['r_s_fh']))
+                         reply_markup= scores_menu(str(prev_choice) if prev_choice != 8 else '8 и больше'))
     await state.set_state(ForecastStates.roma_score_ft)
 
 # 2. Счёт полного матча
 @router.message(ForecastStates.roma_score_ft)
 async def score_ft_roma_handler(message: types.Message, state: FSMContext):
     assert message.text is not None
-    await state.update_data(r_s=message.text.strip())
-
+    await state.update_data(r_s=int(message.text.strip()) if message.text.strip() != '8 и больше' else '8')
+    prev_choice = (await state.get_data())['r_m_fh']
     await message.answer("Сколько Рома пропустит за матч", 
-                         reply_markup=scores_menu((await state.get_data())['r_m_fh']))
+                         reply_markup=scores_menu(str(prev_choice) if prev_choice != 8 else '8 и больше'))
 
     await state.set_state(ForecastStates.rival_score_ft)
 
 @router.message(ForecastStates.rival_score_ft)
 async def score_ft_opp_handler(message: types.Message, state: FSMContext):
     assert message.text is not None
-    await state.update_data(r_m=message.text.strip())
+    await state.update_data(r_m=int(message.text.strip()) if message.text.strip() != '8 и больше' else '8')
 
     await message.answer("Кто забьёт голы за Рому?\n"
                          "Теперь ВАШИ ограничения доступны в скобочках \\(\\) напротив фамилии футболиста\n"
-                         "То же самое, что в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)",
+                         "То же самое, что в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)"
+                         "Если у вас стоит 0 в таблице, значит вы не сможете больше выбрать этого футболиста",
                          parse_mode="MarkdownV2",
                          reply_markup= ReplyKeyboardRemove())
 
@@ -200,8 +201,10 @@ async def collecting_scorers_input(message: types.Message, state: FSMContext):
     players_list = [k for k in players_dict]
     assert message.text is not None
     text = message.text.split(' (')[0]
-
-    drop_players = [k for k, v in goals_restrict[authorized_users[message.from_user.id]].items() if v == '0']  # type: ignore
+    if authorized_users[message.from_user.id] in goals_restrict: # type: ignore
+        drop_players = [k for k, v in goals_restrict[authorized_users[message.from_user.id]].items() if v == '0']  # type: ignore
+    else:
+        drop_players = []
     if text in players_list and text not in drop_players:
         
         inputs.append(text)
@@ -269,8 +272,11 @@ async def collecting_assist_input(message: types.Message, state: FSMContext):
     players_list = [k for k in players_dict]
     assert message.text is not None
     text = message.text.split(' (')[0]
-
-    drop_players = [k for k, v in assists_restrict[authorized_users[message.from_user.id]].items() if v == '0']  # type: ignore
+    
+    if authorized_users[message.from_user.id] in assists_restrict: # type: ignore
+        drop_players = [k for k, v in assists_restrict[authorized_users[message.from_user.id]].items() if v == '0']  # type: ignore
+    else:
+        drop_players = []
     if text in players_list and text not in drop_players:
 
         inputs.append(text)
