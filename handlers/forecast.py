@@ -3,6 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.filters import StateFilter
 from aiogram.types import ReplyKeyboardRemove
 from datetime import datetime as dt
+from aiogram.types import FSInputFile
 
 
 from states.user_states import ForecastStates, MultiInputStates
@@ -36,6 +37,9 @@ async def start_forecast(message: types.Message, state: FSMContext):
     control = await update_time_in_control(control)
     print(f'==== {authorized_users[user_id]} делает прогноз переменная управления: \n {control}')
     if control['polling']:
+        #гифка
+        animation_from_file = FSInputFile(path=f"data/{control['m_id']}.mp4") # type: ignore
+        await message.answer_animation(animation=animation_from_file)
 
         await message.answer(f"{tq['q']}",
                             reply_markup=tq_menu)
