@@ -38,7 +38,7 @@ async def start_forecast(message: types.Message, state: FSMContext):
     print(f'==== {authorized_users[user_id]} делает прогноз переменная управления: \n {control}')
     if control['polling']:
         #гифка
-        animation_from_file = FSInputFile(path=f"data/{control['m_id']}.mp4") # type: ignore
+        animation_from_file = FSInputFile(path=f"utils/{control['m_id']}.mp4") # type: ignore
         await message.answer_animation(animation=animation_from_file)
 
         await message.answer(f"{tq['q']}",

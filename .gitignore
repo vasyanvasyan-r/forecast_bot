@@ -28,7 +28,7 @@ dict_with_codes.json
 testing.ipynb
 pull_data/all_forecasts.json
 
-data/players.json
+
 utils/*.json
 
 # --- OS-specific ---
