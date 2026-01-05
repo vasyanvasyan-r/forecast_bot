@@ -38,8 +38,8 @@ async def start_forecast(message: types.Message, state: FSMContext):
     print(f'==== {authorized_users[user_id]} делает прогноз переменная управления: \n {control}')
     if control['polling']:
         #гифка
-        animation_from_file = FSInputFile(path=f"utils/{control['m_id']}.mp4") # type: ignore
-        await message.answer_animation(animation=animation_from_file)
+        #animation_from_file = FSInputFile(path=f"utils/{control['m_id']}.mp4") # type: ignore
+        #await message.answer_animation(animation=animation_from_file)
 
         await message.answer(f"{tq['q']}",
                             reply_markup=tq_menu)
@@ -107,8 +107,8 @@ async def score_ft_opp_handler(message: types.Message, state: FSMContext):
     await state.update_data(r_m=int(message.text.strip()) if message.text.strip() != '8 и больше' else '8')
 
     await message.answer("Кто забьёт голы за Рому?\n"
-                         "Теперь ВАШИ ограничения доступны в скобочках \\(\\) напротив фамилии футболиста\n"
-                         "То же самое, что в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)"
+                         "После этого матча обновятся ограничения и у вас снова будет по 13 упоминаний на каждого футболиста, но уже до конца сезона\\. Дерзайте\\!\n"
+                         "Все ограничения как в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)\\.\n"
                          "Если у вас стоит 0 в таблице, значит вы не сможете больше выбрать этого футболиста",
                          parse_mode="MarkdownV2",
                          reply_markup= ReplyKeyboardRemove())
