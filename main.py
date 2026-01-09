@@ -41,8 +41,8 @@ async def on_startup(bot: Bot, ):
                 await bot.send_message(
                     chat_id=user_id,
                     text=(
-                        "С новым годом, наш дорогой <b>Прогнозист</b>!\n"
-                        "Бот готов принимать прогнозы на матч против Лечче. Обратите внимание на Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча.\n\n"
+                        "С прошедшими праздниками, наш дорогой <b>Прогнозист</b>!\n"
+                        "Бот готов принимать прогнозы на матч против Сасуолло. Обратите внимание на Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча.\n\n"
 
                         "Вот наш <a href='https://docs.google.com/document/d/1K7zAyX-6zEeMXGZAaAY59QjVyFsZpyNQgw1dZ4_dXBw/edit?tab=t.0'>Гайд</a>\n"
                         "Вот наши Таблицы <a href='https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1893944730#gid=1893944730'>Прогнозиста</a>\n"
