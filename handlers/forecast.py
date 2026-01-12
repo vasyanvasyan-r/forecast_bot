@@ -107,8 +107,7 @@ async def score_ft_opp_handler(message: types.Message, state: FSMContext):
     await state.update_data(r_m=int(message.text.strip()) if message.text.strip() != '8 и больше' else '8')
 
     await message.answer("Кто забьёт голы за Рому?\n"
-                         "Теперь у вас всех снова по 13 упоминаний в авторах голов и голевых\\. Дерзайте\\!\n"
-                         "Все ограничения как в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)\\.\n"
+                         "Все ограничения на упоминания как в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)\\.\n"
                          "Если у вас стоит 0 в таблице, значит вы не сможете больше выбрать этого футболиста",
                          parse_mode="MarkdownV2",
                          reply_markup= ReplyKeyboardRemove())
