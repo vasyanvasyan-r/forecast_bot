@@ -108,7 +108,7 @@ async def score_ft_opp_handler(message: types.Message, state: FSMContext):
 
     await message.answer("Кто забьёт голы за Рому?\n"
                          "Все ограничения на упоминания как в [таблице](https://docs.google.com/spreadsheets/d/1I7APxniANMu1r1y2uRGKDrLGuR4-OeUZDqvTtrn6vos/edit?gid=1025145962#gid=1025145962)\\.\n"
-                         "Если у вас стоит 0 в таблице, значит вы не сможете больше выбрать этого футболиста",
+                         "Если у вас стоит 0 в таблице, значит вы не сможете больше выбрать этого футболиста, все новички в конце списка",
                          parse_mode="MarkdownV2",
                          reply_markup= ReplyKeyboardRemove())
 
