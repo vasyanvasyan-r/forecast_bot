@@ -32,8 +32,10 @@ with open(os.path.join(DATA_DIR, 'dict_with_codes.json'), 'r', encoding='utf-8')
 with open(os.path.join(DATA_DIR, 'players.json'), 'r', encoding='utf-8') as f:
     players_list = json.load(f)
 
-players_list_menu = [(players_list[name1],players_list[name2]) for name1, name2 in zip(range(0,len(players_list if len(players_list) % 2 != 1 else players_list + ['']), 2), 
-                                                                                       range(1,len(players_list if len(players_list) % 2 != 1 else players_list + ['']), 2))]
+if len(players_list) % 2 == 1:
+    players_list = players_list + ['']
+players_list_menu = [(players_list[name1],players_list[name2]) for name1, name2 in zip(range(0,len(players_list), 2), range(1,len(players_list), 2))]
+
 players_dict = {k:"13" for k in players_list}
 def get_personal_list_of_players(search_dict, players_list = players_list):
     drop_players = [k for k, v in search_dict.items() if v == '0']
