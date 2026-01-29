@@ -21,6 +21,7 @@ data/reboot_notifications.json
 data/notifications.json
 data/tq.json
 data/forecasts.json
+data/players.json
 data/*
 git_ignore.md
 data/dict_with_codes.json
