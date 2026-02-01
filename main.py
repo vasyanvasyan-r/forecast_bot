@@ -10,7 +10,7 @@ from handlers import start, auth, forecast, notifications
 from keyboards.menu import reboot_menu
 from utils.storage import reboot_notifications, authorized_users
 
-test = True
+test = False
 sendmessage = True
 if not test:
     bot = Bot(token=TOKEN)
@@ -41,7 +41,7 @@ async def on_startup(bot: Bot, ):
                 await bot.send_message(
                     chat_id=user_id,
                     text=(
-                        "Доброй ночи, наш дорогой <b>Прогнозист</b>!\n"
+                        "Добрый вечер, наш дорогой <b>Прогнозист</b>!\n"
                         "Бот готов принимать прогнозы на матч чемпионата против Удинезе. Обратите внимание на Ваши прогнозы перестают приниматься ровно за 2 часа до начала матча.\n\n"
 
                         "Вот наш <a href='https://docs.google.com/document/d/1K7zAyX-6zEeMXGZAaAY59QjVyFsZpyNQgw1dZ4_dXBw/edit?tab=t.0'>Гайд</a>\n"
